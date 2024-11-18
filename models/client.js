@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
       Client.hasMany(models.TimeSubmission, {
         foreignKey: 'client_id',
       });
+
+      Client.belongsToMany(models.Consultant,{
+        through: models.ClientConsultant,
+        foreignKey: 'client_id',
+      }); 
     }
   }
   

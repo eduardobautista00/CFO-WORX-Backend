@@ -11,6 +11,8 @@ const branchController = require('../controllers/branchController');
 const staffLogController = require('../controllers/staffLogController');
 const userBranchesController = require('../controllers/userBranchController');
 const resourceController = require('../controllers/resourceController');
+const clientController = require('../controllers/clientController');
+const consultantController = require('../controllers/consultantController');
 const upload = require ('../utils/multerConfig');
 
 const authorize = require('../middleware/authorizationMiddleware'); 
@@ -90,6 +92,20 @@ router.put('/update-resource/:id', upload.array('resource_media'), resourceContr
 router.delete('/delete-resource/:id', resourceController.deleteResource);
 router.get('/get-user-resource', resourceController.getResourceByLoggedInUser);
 router.get('/resources', resourceController.getResourcesByStatus);
+
+// CRUD Routes for Client Management
+router.get('/clients', clientController.getClients);
+router.get('/client/:id', clientController.getClientById);
+router.post('/create-client', clientController.createClient);
+router.put('/update-client/:id', clientController.updateClient);
+router.delete('/delete-client/:id', clientController.deleteClient);
+
+// CRUD Routes for Consultant Management
+router.get('/consultants', consultantController.getConsultantById);
+router.get('/consultant/:id', consultantController.getConsultantById);
+router.post('/create-consultant', consultantController.createConsultant);
+router.put('/update-consultant/:id', consultantController.updateConsultant);
+router.delete('/delete-consultant/:id', consultantController.deleteConsultant);
 
 module.exports = router;
 
