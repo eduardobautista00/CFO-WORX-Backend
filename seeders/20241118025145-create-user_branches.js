@@ -6,9 +6,9 @@ module.exports = {
 
       await queryInterface.bulkInsert('user_branches', [
         {user_id: 1,
-        branch_id: 1},
+        branch_id: 1 , "createdAt": new Date(), "updatedAt": new Date()},
         {user_id: 2,
-        branch_id: 1}
+        branch_id: 1 , "createdAt": new Date(), "updatedAt": new Date()}
       ], {});
     
   },

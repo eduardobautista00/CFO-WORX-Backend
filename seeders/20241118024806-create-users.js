@@ -16,14 +16,18 @@ module.exports = {
           last_name: 'User',
           sex: 'Male',
           email: 'eduardoculladobautista1113@gmail.com',
-          password: hashedAdminPassword, // Use the hashed password
+          password: hashedAdminPassword,
+          "createdAt": new Date(),
+          "updatedAt": new Date() 
         },
         {
           first_name: 'Sample',
           last_name: 'Consultant',
           sex: 'Female',
           email: 'sampleconsultant@email.com',
-          password: hashedConsultantPassword, // Use the hashed password
+          password: hashedConsultantPassword,
+          "createdAt": new Date(),
+          "updatedAt": new Date()
         },
       ],
       {}

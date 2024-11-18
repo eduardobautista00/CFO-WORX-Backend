@@ -8,7 +8,9 @@ module.exports = {
         "branch_name": "Main", 
         "branch_address": "Address", 
         "operating_hours": '{ "open": "8:00", "close": "16:00" }', 
-        "status": "Closed"
+        "status": "Closed",
+        "createdAt": new Date(),
+        "updatedAt": new Date()
       }], {});
     
   },
