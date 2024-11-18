@@ -9,7 +9,6 @@ module.exports = function loadDbPermission(request, res, next) {
                     if (user) {
                         request.user = {
                             id: user.id,
-                            username: user.username,
                             email: user.email,
                             roles: user.roles.map(role => ({
                                 id: role.id,

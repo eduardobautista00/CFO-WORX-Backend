@@ -26,7 +26,7 @@ const getUsers = async (req, res) => {
           attributes: ['id', 'resource_title']
         },
       ],
-      attributes: ['id', 'first_name', 'last_name', 'sex', 'username', 'email']
+      attributes: ['id', 'first_name', 'last_name', 'sex', 'email']
     });
     res.status(200).json(user);
   } catch (error) {
@@ -53,7 +53,7 @@ const getUserById = async (req, res) => {
           attributes: ['id', 'resource_title']
         },
       ],
-      attributes: ['id', 'first_name', 'last_name', 'sex', 'username', 'email', 'password']
+      attributes: ['id', 'first_name', 'last_name', 'sex', 'email', 'password']
     });
     if (user) {
       res.status(200).json(user);
@@ -87,12 +87,12 @@ const getCurrentUser = async (req, res) => {
           attributes: ['id', 'resource_title']
         },
       ],
-      attributes: ['id', 'first_name', 'last_name', 'sex', 'username', 'email']
+      attributes: ['id', 'first_name', 'last_name', 'sex', 'email']
     });
 
     if (user) {
       // Extract and format the role and Permission data
-      const RoleWithPermissions = user.Role.map(role => ({
+      const RoleWithPermissions = user.Role?.map(role => ({
         role_name: role.role_name,
         role_description: role.role_description,
       }));
@@ -103,11 +103,10 @@ const getCurrentUser = async (req, res) => {
         first_name: user.first_name,
         last_name: user.last_name,
         sex: user.sex,
-        username: user.username,
         email: user.email,
-        branch: user.Branch.map(branch => branch.branch_name) || [],
+        branch: user.Branches?.map(branch => branch.branch_name) || [],
         Role: RoleWithPermissions, // Adjusted to include categories for each ticket
-        created_resources: user.Resource.map(resource => resource.resource_title) || []
+        created_resources: user.Resource?.map(resource => resource.resource_title) || []
       };
 
       res.status(200).json(response);
@@ -121,9 +120,9 @@ const getCurrentUser = async (req, res) => {
 
 
 const addUser = async (req, res) => {
-  const { first_name, last_name, sex, username, email, password, branch_ids, role_name} = req.body;
+  const { first_name, last_name, sex, email, password, branch_ids, role_name} = req.body;
   try {
-    const newUser = await User.create({first_name, last_name, sex, username, email, password, branch_ids });
+    const newUser = await User.create({first_name, last_name, sex, email, password });
    
     const role = await Role.findOne({where: {role_name}});
     if(!role){
@@ -134,8 +133,8 @@ const addUser = async (req, res) => {
       role_id: role.id
     });
     
-     if (branch_ids && branch_ids.length > 0) {
-      await Promise.all(branch_ids.map(branch_id =>
+    if (branch_ids && branch_ids.length > 0) {
+      await Promise.all(branch_ids?.map(branch_id =>
         UserBranch.create({
           user_id: newUser.id,
           branch_id
@@ -145,24 +144,22 @@ const addUser = async (req, res) => {
 
     res.status(201).json({ message: 'User created successfully', user: newUser });
     await sendEmail(newUser.email, 'Welcome to CFO WORX', 
-      `Hello ${newUser.first_name}, your account has been created successfully. Your username is: ${newUser.username} and your password is ${password}. Kindly update your password through your Profile Page once you have logged in to ensure account security. Thank you!`);
+      `Hello ${newUser.first_name}, your account has been created successfully. Your email is: ${newUser.email} and your password is ${password}. Kindly update your password through your Profile Page once you have logged in to ensure account security. Thank you!`);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   
   try {
-    const user = await User.findOne({ where: { username } ,
+    const user = await User.findOne({ where: { email } ,
       include: [
         {
           model: Role,
-          as: 'Role', 
           include: {
             model: Permission,
-            as: 'Permission', 
             through: { attributes: [] } 
           }
         },
@@ -170,17 +167,17 @@ const login = async (req, res) => {
     
     });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(401).json({ error: 'User not found' });
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid username or password' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }   
 
     const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '2h' });
     const refreshToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
-    const roleName = user.Role.some(role => role.role_name === 'Admin') ? 'Admin' : 'Staff';
+    const roleName = user.Roles?.some(role => role.role_name === 'Admin') ? 'Admin' : 'Consultant';
 
   
     setTokens(res, accessToken, refreshToken);
@@ -189,9 +186,9 @@ const login = async (req, res) => {
     
     await StaffLog.create({ user_id: user.id, action: 'login'});
 
-    const roleAndpermission = user.Role.map(role => ({
+    const roleAndpermission = user.Roles?.map(role => ({
       role_name: role.role_name,
-      permission: role.Permission.map(permission => permission.permission_name)
+      permission: role.Permissions?.map(permission => permission.permission_name)
     }));
 
     res.status(200).json({ 
@@ -201,7 +198,6 @@ const login = async (req, res) => {
       user: {
         first_name: user.first_name,
         last_name: user.last_name,
-        username: user.username,
         password: user.password,
         email: user.email,
         authority: roleAndpermission 
@@ -245,7 +241,7 @@ const refresh = async (req, res) => {
 const updateUser = async (req, res) => {
     
   const id = parseInt(req.params.id);
-  const { first_name, last_name, sex, username, email, password, role_name, branch_ids} = req.body;
+  const { first_name, last_name, sex, email, password, role_name, branch_ids} = req.body;
   try {
     const user = await User.findByPk(id);
 
@@ -253,7 +249,6 @@ const updateUser = async (req, res) => {
       user.first_name = first_name;
       user.last_name = last_name;
       user.sex = sex;
-      user.username = username;
       user.email = email;
       if (password) {
         user.password = password; 
@@ -274,7 +269,7 @@ const updateUser = async (req, res) => {
       
       if (branch_ids) {
         await UserBranch.destroy({ where: { user_id: user.id } }); 
-        const branchAssignments = branch_ids.map(branch_id => ({
+        const branchAssignments = branch_ids?.map(branch_id => ({
           user_id: user.id,
           branch_id
         }));
@@ -305,7 +300,7 @@ const deleteUser = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const { username, email, oldPassword, newPassword } = req.body;
+  const {email, oldPassword, newPassword } = req.body;
 
   try {
     const userId = req.user.id;
@@ -327,14 +322,12 @@ const updateProfile = async (req, res) => {
       user.password = newPassword;
     }
 
-    // Update username and email if provided
-    if (username) user.username = username;
+    // Update email if provided
     if (email) user.email = email;
 
     await user.save();
     res.status(200).json({ message: 'Profile updated successfully.' });
     await sendEmail(user.email, 'Profile Updated', `Hello ${user.first_name}, your profile has been updated successfully. 
-      Username: ${username}
       Email: ${email},
       Old Password: ${oldPassword}
       New Password: ${newPassword} `);
@@ -376,7 +369,7 @@ const resetPassword = async (req, res) => {
     });
 
     // Send reset email
-    const resetUrl = `https://v2.revivepharmacyportal.com.au/reset-password/${resetToken}`;
+    const resetUrl = `https://localhost:5173/reset-password/${resetToken}`;
     await sendEmail(user.email, 'Password Reset Request', `Please click the following link to reset your password: ${resetUrl}`);
 
     res.status(200).json({ message: 'Password reset email sent.' });
