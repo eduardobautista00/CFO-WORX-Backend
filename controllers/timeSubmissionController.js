@@ -1,60 +1,59 @@
-const {TimeSubmission, User, Branch, Role} = require('../models');
+const {TimeSubmission, User, Branch, Role, DailyAllocation} = require('../models');
 const path = require('path');
 const fs = require('fs');
 
 
-const createTimeSubmission = async (req, res) => {
-  const { data } = req.body;
-  const { user } = req;
+const submitWeeklyReport = async (req, res) => {
+  const { client_id, week_start, allocations } = req.body;
+  const { consultant_id } = req;
 
   try {
-    // Fetch the user's Branch through the join table
-    const userWithBranch = await User.findByPk(user.id, {
-      include: [{ model: Branch }]
+    let totalHours = 0;
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+    // Validate allocations
+    allocations.forEach((day) => {
+      const dailyTotal = day.client_facing_hours + day.non_client_facing_hours + day.other_task_hours;
+      if (dailyTotal > 12) throw new Error(`${day.day_of_week} exceeds 12 hours.`);
+      totalHours += dailyTotal;
     });
+    if (totalHours > 40) throw new Error(`Total hours exceed 40 for the week.`);
 
-    if (!userWithBranch.Branch || userWithBranch.Branch.length === 0) {
-      return res.status(400).json({ error: 'User is not assigned to any branch.' });
-    }
+    // Create a time submission record
+    const timeSubmission = await TimeSubmission.create({ client_id, consultant_id, week_start, total_hours: totalHours });
 
-    // You can choose which branch to assign here, e.g., the first one
-    const branch_id = userWithBranch.Branch[0].id; // or any logic to choose the branch
-  
-    
-    const newTimeSubmission = await TimeSubmission.create({
-      data,
-      user_id: user.id,
-    });
+    // Insert daily allocations
+    await Promise.all(
+      allocations.map((day) =>
+        DailyAllocation.create({
+          time_submission_id: timeSubmission.id,
+          day_of_week: day.day_of_week,
+          client_facing_hours: day.client_facing_hours,
+          non_client_facing_hours: day.non_client_facing_hours,
+          other_task_hours: day.other_task_hours,
+        })
+      )
+    );
 
-    res.status(201).json({ message: `TimeSubmission created with ID ${newTimeSubmission.id}` });
+    res.status(201).json({ message: 'Weekly Report submitted successfully', timeSubmission });
   } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      res.status(400).json({ error: 'TimeSubmission already exists.' });
-    } else if (error.name === 'SequelizeForeignKeyConstraintError') {
-      res.status(400).json({ error: 'Invalid data provided.' });
-    } else {
-      res.status(500).json({ error: error.message });
-    }
+    res.status(400).json({ error: error.message });
   }
 };
 
 
-const getTimeSubmission = async (req, res) => {
+const fetchWeeklyReport = async (req, res) => {
   try {
     const allTimeSubmission = await TimeSubmission.findAll({ order: 
-    [['createdAt', 'ASC']],
+    [['week_start', 'DESC']],
     include: [
           {
-          model: User,
-          include: [
-            {
-              model: Role,
-              attributes: ['role_name'], // Include the role name from Role
-            },
-          ],
-          attributes: ['first_name', 'sex', 'last_name'], // Include user attributes
+          model: DailyAllocation,
+          attributes: [
+            'day_of_week', 'client_facing_hours', 
+            'non_client_facing_hours', 'other_task_hours'
+          ], 
         },
-            
         ]
     });
     res.status(200).json(allTimeSubmission);
@@ -63,21 +62,35 @@ const getTimeSubmission = async (req, res) => {
   }
 };
 
-const getTimeSubmissionByCode = async (req, res) => {
-  const id = parseInt(req.params.id);
+const fetchWeeklyReportByClientID = async (req, res) => {
+  const client_id = parseInt(req.params.id);
   try {
-    const TimeSubmission = await TimeSubmission.findByPk(id);
-    if (TimeSubmission) {
-      res.status(200).json(TimeSubmission);
+    const reportByID = await TimeSubmission.findOne({where: {client_id}});
+    if (reportByID) {
+      res.status(200).json(reportByID);
     } else {
-      res.status(404).json({ error: 'Time Submission not found' });
+      res.status(404).json({ error: 'Weekly Time Submission not found' });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const updateTimeSubmission = async (req, res) => {
+const fetchWeeklyReportByConsultantID = async (req, res) => {
+  const consultant_id = parseInt(req.params.id);
+  try {
+    const reportByID = await TimeSubmission.findOne({where: {consultant_id}});
+    if (reportByID) {
+      res.status(200).json(reportByID);
+    } else {
+      res.status(404).json({ error: 'Weekly Time Submission not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updateWeeklyReport = async (req, res) => {
   const id = parseInt(req.params.id);
   const { data } = req.body;
   try {
@@ -86,21 +99,21 @@ const updateTimeSubmission = async (req, res) => {
       const updatedTimeSubmission = await TimeSubmission.findOne({ where: { id } });
       res.status(200).json(updatedTimeSubmission);
     } else {
-      res.status(404).json({ error: 'Time Submission not found' });
+      res.status(404).json({ error: 'Weekly Time Submission not found' });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const deleteTimeSubmission = async (req, res) => {
+const deleteWeeklyReport = async (req, res) => {
   const id = parseInt(req.params.id);
   try {
     const deleted = await TimeSubmission.destroy({ where: { id } });
     if (deleted) {
-      res.status(200).json({ message: 'Time Submission deleted successfully' });
+      res.status(200).json({ message: 'Weekly Time Submission deleted successfully' });
     } else {
-      res.status(404).json({ error: 'Time Submission not found' });
+      res.status(404).json({ error: 'Weekly Time Submission not found' });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -108,21 +121,22 @@ const deleteTimeSubmission = async (req, res) => {
 };
 
 
-const massDeleteTimeSubmission = async (req,res) => {
+const massDeleteWeeklyReports = async (req,res) => {
     const { ids } = req.body;
     try{
       await TimeSubmission.destroy({ where: { id: ids } });
-    res.status(200).send({ message: 'Selected Time Submission deleted successfully' });
+    res.status(200).send({ message: 'Selected Weekly Time Submissions deleted successfully' });
   } catch (error) {
-    res.status(500).send({ error: 'Failed to delete selected Time Submission' });
+    res.status(500).send({ error: 'Failed to delete selected Weekly Time Submissions' });
   }
   };
   
 module.exports = {
-  createTimeSubmission,
-  getTimeSubmission,
-  getTimeSubmissionByCode,
-  updateTimeSubmission,
-  deleteTimeSubmission,
-  massDeleteTimeSubmission
+  submitWeeklyReport,
+  fetchWeeklyReport,
+  fetchWeeklyReportByClientID,
+  fetchWeeklyReportByConsultantID,
+  updateWeeklyReport,
+  deleteWeeklyReport,  
+  massDeleteWeeklyReports
 };

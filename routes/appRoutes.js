@@ -13,6 +13,7 @@ const userBranchesController = require('../controllers/userBranchController');
 const resourceController = require('../controllers/resourceController');
 const clientController = require('../controllers/clientController');
 const consultantController = require('../controllers/consultantController');
+const adminController = require('../controllers/adminController');
 const upload = require ('../utils/multerConfig');
 
 const authorize = require('../middleware/authorizationMiddleware'); 
@@ -72,12 +73,13 @@ router.put('/update-branch/:id', branchController.updateBranch);
 router.delete('/delete-branch/:id', branchController.deleteBranch);
 
 // Ticket Routes
-router.get('/time-submissions', timeSubmissionController.getTimeSubmission);
-router.get('/time-submission/:id', timeSubmissionController.getTimeSubmissionByCode);
-router.post('/create-time-submission',  timeSubmissionController.createTimeSubmission);
-router.put('/update-time-submission/:id', timeSubmissionController.updateTimeSubmission);
-router.delete('/delete-time-submission/:id', timeSubmissionController.deleteTimeSubmission);
-router.post('/mass-delete-timeSubmissions', timeSubmissionController.massDeleteTimeSubmission);
+router.get('/weekly-reports', timeSubmissionController.fetchWeeklyReport);
+router.get('/weekly-report_client/:id', timeSubmissionController.fetchWeeklyReportByClientID);
+router.get('/weekly-report_consultant/:id', timeSubmissionController.fetchWeeklyReportByConsultantID);
+router.post('/create-weekly-report',  timeSubmissionController.submitWeeklyReport);
+router.put('/update-weekly-report/:id', timeSubmissionController.updateWeeklyReport);
+router.delete('/delete-weekly-report/:id', timeSubmissionController.deleteWeeklyReport);
+router.post('/mass-delete-weekly-reports', timeSubmissionController.massDeleteWeeklyReports);
 
 // Staff Log Route
 router.get('/staffLogs', staffLogController.getAllStaffLogs);
@@ -106,6 +108,12 @@ router.get('/consultant/:id', consultantController.getConsultantById);
 router.post('/create-consultant', consultantController.createConsultant);
 router.put('/update-consultant/:id', consultantController.updateConsultant);
 router.delete('/delete-consultant/:id', consultantController.deleteConsultant);
+
+// Fetch Dashboard
+router.get('/dashboard', adminController.fetchDashboard);
+router.get('/pending-reports', adminController.fetchPendingReports);
+router.put('/update-reportStatus', adminController.updateReportStatus);
+router.post('/notify-for-pending', adminController.pendingNotification);
 
 module.exports = router;
 

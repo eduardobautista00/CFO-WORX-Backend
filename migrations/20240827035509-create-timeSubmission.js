@@ -10,10 +10,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      data: {
-        type: Sequelize.JSON,
-        allowNull: true,
-      },
       client_id:{
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -29,6 +25,31 @@ module.exports = {
           model: 'consultants',
           key: 'id'
         }
+      },
+      week_start : {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      total_hours: {
+        type: Sequelize.DECIMAL(5, 1),
+        allowNull: false,
+        validate: {
+          maxValue(value) {
+            if (value > 40) {
+              throw new Error("Total hours must not exceed 40.");
+            }
+          }
+        }      
+      },
+      submissionStatus: {
+        type: Sequelize.ENUM('Unsubmitted', 'Submitted'),
+        allowNull: false,
+        defaultValue: 'Unsubmitted',
+      },
+      approvalStatus: {
+        type: Sequelize.ENUM('Approved', 'Pending', 'Rejected'),
+        allowNull: false,
+        defaultValue: 'Pending',
       },
       createdAt: {
         allowNull: false,
