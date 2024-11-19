@@ -115,5 +115,8 @@ router.get('/pending-reports', adminController.fetchPendingReports);
 router.put('/update-reportStatus', adminController.updateReportStatus);
 router.post('/notify-for-pending', adminController.pendingNotification);
 
+router.get('/client-activity', clientController.clientActivity);
+router.get('/utilization-report', consultantController.utilizationReport);
+
 module.exports = router;
 

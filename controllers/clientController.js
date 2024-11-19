@@ -1,4 +1,5 @@
-const {Client, Consultant, User} = require('../models');
+const {Client, Consultant, User, TimeSubmission} = require('../models');
+const sequelize = require('sequelize');
 
 const getClients = async (req, res) => {
     try {
@@ -126,8 +127,8 @@ const getClients = async (req, res) => {
                     group: ['TimeSubmission.client_id']
                 }
             ],
-            attributes: ['id', 'name', 'services'], // Client details
-            order: [['id', 'ASC']]
+            attributes: ['id', 'client_code', 'services'], // Client details
+            order: [['client_code', 'ASC']]
         });
 
         // Transform data into the required format
@@ -151,11 +152,6 @@ const getClients = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-module.exports = {
-    clientActivity
-};
-
   
   module.exports = {
     getClients,
