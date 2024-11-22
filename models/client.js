@@ -4,10 +4,6 @@ const {Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Client extends Model {
     static associate(models) {
-      Client.belongsTo(models.User,{
-        foreignKey: 'user_id',
-      });
-
       Client.hasMany(models.TimeSubmission, {
         foreignKey: 'client_id',
       });
@@ -20,14 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   }
   
   Client.init({
-    user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references:{
-          model:'users',
-          key:'id'
-        }
-      },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: false,
+    },
     client_code: {
         type: DataTypes.INTEGER,
         allowNull: false,

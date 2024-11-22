@@ -109,14 +109,19 @@ router.post('/create-consultant', consultantController.createConsultant);
 router.put('/update-consultant/:id', consultantController.updateConsultant);
 router.delete('/delete-consultant/:id', consultantController.deleteConsultant);
 
-// Fetch Dashboard
+// Admin Functions
 router.get('/dashboard', adminController.fetchDashboard);
 router.get('/pending-reports', adminController.fetchPendingReports);
 router.put('/update-reportStatus', adminController.updateReportStatus);
 router.post('/notify-for-pending', adminController.pendingNotification);
+router.put('/change-admin-email', adminController.changeAdminEmail);
+router.post('/send-resetPassword', adminController.sendResetPassword);
+router.post('/set-autoreport-date', adminController.setAutomaticReportDate);
 
 router.get('/client-activity', clientController.clientActivity);
 router.get('/utilization-report', consultantController.utilizationReport);
+router.post('/add-consultant-utilization', consultantController.addConsultantUtilization);
+router.post('/consultant-alert', consultantController.consultantAlert);
 
 module.exports = router;
 

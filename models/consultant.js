@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ClientConsultant,
         foreignKey: 'consultant_id',
       }); 
+
+      Consultant.hasOne(models.ConsultantAlert,{
+        foreignKey: 'consultant_id'
+      });
+      
     }
   }
   
@@ -40,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+
   }, {
     timestamps:true,
     sequelize,

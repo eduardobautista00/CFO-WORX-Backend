@@ -1,4 +1,4 @@
-const {Client, Consultant, User, TimeSubmission} = require('../models');
+const {Client, Consultant, User, TimeSubmission, ClientConsultant} = require('../models');
 const sequelize = require('sequelize');
 
 const getConsultants = async (req, res) => {
@@ -7,23 +7,43 @@ const getConsultants = async (req, res) => {
         order: [['id', 'ASC']],
         include: [
           {
-            model: Client,
-            include: [
-                {
-                    model: User,
-                    attributes: ['first_name', 'last_name']
-                }
-
-            ],
-            attributes: ['client_code'] // Exclude join table attributes
+            model: User,
+            attributes: ['first_name', 'last_name', 'email'] 
           }
-        ]
+        ],
+        attributes: ['title', 'salary_per_hour', 'bill_rate']
       });
       res.status(200).json(allConsultant);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
+
+  
+const getConsultantswithClient = async (req, res) => {
+  try {
+    const allConsultant = await Consultant.findAll({
+      order: [['id', 'ASC']],
+      include: [
+        {
+          model: User,
+          attributes: ['first_name', 'last_name', 'email']
+        },
+
+        {
+          model: Client,
+          through: { attributes: [] },
+          attributes: ['name', 'client_code', 'services', 'utilization_target', 'revenue'] 
+        }
+      ]
+    });
+    res.status(200).json(allConsultant);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
   
    const getConsultantById = async (req, res) => {
     try {
@@ -120,7 +140,7 @@ const getConsultants = async (req, res) => {
               {
                 model: Client,
                 where: clientTypeFilter,
-                attributes: ['client_code', 'services', 'utilization_target']
+                attributes: ['name', 'client_code', 'services', 'utilization_target']
               }
             ],
             attributes: [
@@ -192,14 +212,81 @@ const getConsultants = async (req, res) => {
     return ((totalHours / utilizationTarget) * 100).toFixed(2);
   };
   
+  const addConsultantUtilization = async (req,res) => {
+    const { last_name, first_name, expected_hours_per_week, actual_utilization} = req.body;
+    try{
+      const consultant = await User.findOne({
+        where:{last_name} && {first_name},
+        include: [
+          {
+            model: Consultant,
+            include: [
+            {
+              model: Client,
+              attributes: ['id']
+            }
+            ],
+            attributes: ['id']
+          }
+        ]
+      })
+
+      if(!consultant){
+        return res.status(404).json({message: 'Consultant not found'})
+      } else {
+        await ClientConsultant.create({
+          client_id: consultant.Client.id,
+          consultant_id: consultant.id,
+          expected_work_hours: expected_hours_per_week,
+          actual_utilization
+        });
+      }
+
+      res.status(200).json({message: 'Consultant Utilization Data Fetched Successfully', response})
+    } catch (error){
+      res.status(500).json({error: error.message})
+    }
+  };
+
+  const consultantAlert = async(req, res) => {
+    const {email, alert_days, alert_message} = req.body;
+    try{
+      const consultantToAlert = await User.findOne({
+        where: { email } ,
+        include:[ {
+            model: Consultant,
+            attributes: []
+        } ],
+        attributes: ['id']
+    });
+
+      if(!consultantToAlert){
+        return res.status(404).json({message: 'Failed to find Consultant'});
+      } else{
+        await consultantAlert.create({
+          consultant_id: consultantToAlert.id,
+          alert_days,
+          alert_message
+        })
+      }
+
+      res.status(200).json({message: 'Alert has been sent to the consultant'})
+    } catch (error){
+      res.status(500).json({error: error.message})
+    }
+  }
   
+
   module.exports = {
     getConsultants,
+    getConsultantswithClient,
     getConsultantById,
     createConsultant,
     updateConsultant,
     deleteConsultant,
-    utilizationReport
+    utilizationReport,
+    addConsultantUtilization,
+    consultantAlert
   };
   
   

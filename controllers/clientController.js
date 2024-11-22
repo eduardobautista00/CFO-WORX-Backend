@@ -17,8 +17,7 @@ const getClients = async (req, res) => {
             ],
             attributes: ['title'] 
           }
-        ],
-        attributes: ['client_code', 'services', 'utilization_target', 'revenue' ]
+        ]
       });
       res.status(200).json(allClient);
     } catch (error) {
@@ -42,8 +41,7 @@ const getClients = async (req, res) => {
               ],
               attributes: ['title'] 
             }
-          ],
-          attributes: ['client_code', 'services', 'utilization_target', 'revenue' ]
+          ]
       });
   
       if (!client) {
@@ -58,9 +56,9 @@ const getClients = async (req, res) => {
   };
   
   const createClient = async (req, res) => {
-    const { client_code, services, utilization_target, revenue,} = req.body;
+    const { name, client_code, services, utilization_target, revenue,} = req.body;
     try {
-      const newClient = await Client.create({ client_code, services, utilization_target, revenue, });
+      const newClient = await Client.create({name, client_code, services, utilization_target, revenue, });
       res.status(201).json({ message: `Client added with ID: ${newClient.id}` });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -69,9 +67,9 @@ const getClients = async (req, res) => {
   
   const updateClient = async (req, res) => {
     const id = parseInt(req.params.id);
-    const { client_code, services, utilization_target, revenue, } = req.body;
+    const { name, client_code, services, utilization_target, revenue, } = req.body;
     try {
-      const [updated] = await Client.update({ client_code, services, utilization_target, revenue,  }, { where: { id } });
+      const [updated] = await Client.update({ name, client_code, services, utilization_target, revenue,  }, { where: { id } });
       if (updated) {
         const updatedClient = await Client.findByPk(id);
         res.status(200).json(updatedClient);
@@ -127,7 +125,7 @@ const getClients = async (req, res) => {
                     group: ['TimeSubmission.client_id']
                 }
             ],
-            attributes: ['id', 'client_code', 'services'], // Client details
+            attributes: ['id', 'name', 'client_code', 'services'], // Client details
             order: [['client_code', 'ASC']]
         });
 

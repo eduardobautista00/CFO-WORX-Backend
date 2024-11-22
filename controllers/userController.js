@@ -1,4 +1,4 @@
-const {User, StaffLog, Branch, Role, UserRole, Permission, UserBranch, Resource, ResetPassword} = require('../models');
+const {User, StaffLog, Branch, Role, UserRole, Permission, UserBranch, Resource, ResetPassword, Consultant} = require('../models');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');

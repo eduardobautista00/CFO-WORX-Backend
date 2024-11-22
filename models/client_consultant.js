@@ -30,6 +30,14 @@ module.exports = (sequelize, DataTypes) => {
         model: 'consultants', 
         key: 'id'
       }
+    },
+    expected_work_hours: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    actual_utilization: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     }
   }, {
     timestamps:true,
