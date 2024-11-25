@@ -103,7 +103,7 @@ router.put('/update-client/:id', clientController.updateClient);
 router.delete('/delete-client/:id', clientController.deleteClient);
 
 // CRUD Routes for Consultant Management
-router.get('/consultants', consultantController.getConsultantById);
+router.get('/consultants', consultantController.getConsultants);
 router.get('/consultant/:id', consultantController.getConsultantById);
 router.post('/create-consultant', consultantController.createConsultant);
 router.put('/update-consultant/:id', consultantController.updateConsultant);
