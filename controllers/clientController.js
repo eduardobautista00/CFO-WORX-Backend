@@ -12,6 +12,10 @@ const getClients = async (req, res) => {
                 {
                     model: User,
                     attributes: ['first_name', 'last_name']
+                },
+                {
+                  model: TimeSubmission,
+                  attributes: ['total_hours']
                 }
 
             ],

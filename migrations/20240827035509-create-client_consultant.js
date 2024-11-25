@@ -25,6 +25,14 @@ module.exports = {
           key: 'id'
         }
       },
+      expected_work_hours: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      actual_utilization: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
