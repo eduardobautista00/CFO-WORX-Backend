@@ -168,6 +168,7 @@ const getConsultantswithClient = async (req, res) => {
           const utilization = calculateUtilization(submission.total_hours, client.utilization_target);
   
           return {
+            name: client.name,
             client_code: client.client_code,
             service: client.services,
             utilization_target: client.utilization_target,
