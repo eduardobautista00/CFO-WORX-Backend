@@ -24,17 +24,13 @@ const fetchDashboard = async (req, res) => {
                     }],
                     attributes: ['total_hours'],
                 },
-
-                {
-                    model: User,
-                    attributes: ['first_name', 'last_name']
-                }
             ],
-            attributes: ['id', 'client_code'], 
+            attributes: ['id', 'name', 'client_code'], 
         });
 
         const clientHours = clientsData.map(client => ({
             client_id: client.id,
+            client_name: client.name,
             client_code: client.client_code,
             total_hours: client.TimeSubmissions.reduce((sum, ts) => sum + ts.total_hours, 0),
         }));
@@ -69,7 +65,7 @@ const fetchDashboard = async (req, res) => {
                 pendingReports.push({
                     consultant_id: consultant.id,
                     user_id: consultant.User?.id,
-                    user_name: consultant.User?.name,
+                    user_name: `${consultant.User?.first_name} ${consultant.User?.last_name}`,
                     email: consultant.User?.email,
                     reminder_date: currentWeekStart,
                 });
