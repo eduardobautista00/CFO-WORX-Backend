@@ -10,12 +10,12 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      time_submission_id:{
-        type: Sequelize.INTEGER,
+      TimecardID:{
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'time_submissions',
-          key: 'id'
+          model: 'timecards',
+          key: 'TimecardID'
         }
       },
       day_of_week: {

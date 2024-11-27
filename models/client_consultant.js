@@ -5,42 +5,36 @@ module.exports = (sequelize, DataTypes) => {
   class ClientConsultant extends Model {
     static associate(models) {
         ClientConsultant.belongsTo(models.Client, {
-        foreignKey: 'client_id',
+        foreignKey: 'ClientID',
       });
       
       ClientConsultant.belongsTo(models.Consultant, {
-        foreignKey: 'consultant_id',
+        foreignKey: 'ConsultantID',
       });
     }
   }
 
   ClientConsultant.init({
-    client_id: {
+    ClientID: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
         model: 'clients', 
-        key: 'id'
+        key: 'ClientID'
       }
     },
-    consultant_id: {
+    ConsultantID: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
         model: 'consultants', 
-        key: 'id'
+        key: 'ConsultantID'
       }
-    },
-    expected_work_hours: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    actual_utilization: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
     }
   }, {
     timestamps:true,
+    createdAt: 'CreatedOn',
+    updatedAt: 'UpdatedOn',
     sequelize,
     modelName: 'ClientConsultant',
     tableName: 'clients_consultants',

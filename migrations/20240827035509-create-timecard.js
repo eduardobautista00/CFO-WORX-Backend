@@ -3,30 +3,34 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('time_submissions',{
-      id: {
+    await queryInterface.createTable('timecards',{
+      TimecardID: {
         allowNull: false,
-        autoIncrement: true,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4, 
         primaryKey: true,
-        type: Sequelize.INTEGER
       },
-      client_id:{
+      ClientID:{
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'clients',
-          key: 'id'
+          key: 'ClientID'
         }
       },
-      consultant_id:{
+      ConsultantID:{
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'consultants',
-          key: 'id'
+          key: 'ConsultantID'
         }
       },
-      week_start : {
+      WeekStartDate : {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      WeekEndDate : {
         type: Sequelize.DATE,
         allowNull: false,
       },
@@ -47,15 +51,31 @@ module.exports = {
         defaultValue: 'Unsubmitted',
       },
       approvalStatus: {
-        type: Sequelize.ENUM('Approved', 'Pending', 'Rejected'),
+        type: Sequelize.ENUM('Approved', 'Pending', 'Rejected', 'Paid'),
         allowNull: false,
         defaultValue: 'Pending',
       },
-      createdAt: {
+      Notes: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      BenchmarkStatus: {
+        type: Sequelize.ENUM('Below', 'Within', 'Above'),
+        allowNull: false,
+      },
+      ApprovedBy: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      RejectedNotes: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      CreatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      UpdatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       }
@@ -63,6 +83,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('time_submissions');
+    await queryInterface.dropTable('timecards');
   }
 };

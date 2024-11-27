@@ -8,27 +8,30 @@
     "dialectOptions": {
         "ssl": false
     },
-    "timezone": "+10:00", 
-    "logging": false
-  },
-  "test": {
-     "username": "reviveph_userserverdb",
-    "password": "bfYxB%uw~oPI",
-    "database": "reviveph_developmentDB",
-    "host": "localhost",
-    "dialect": "mysql",
-    "logging": false
-  },
+    "logging": false,
+    "pool": {
+      "max": 10, 
+      "min": 0, 
+      "acquire": 30000, 
+      "idle": 10000
+  }
+},
+
   "production": {
-   "username": "reviveph_userserverdb",
-    "password": "bfYxB%uw~oPI",
-    "database": "reviveph_developmentDB",
+    "username": "root",
+    "password": "",
+    "database": "cfo-development-db",
     "host": "localhost",
     "dialect": "mysql",
     "dialectOptions": {
         "ssl": false
     },
-    "timezone": "+10:00", 
-    "logging": false
+    "logging": false,
+    "pool": {
+      "max": 10, 
+      "min": 0, 
+      "acquire": 30000, 
+      "idle": 10000
+  }
   }
 }

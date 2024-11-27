@@ -9,35 +9,27 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      client_id: {
+      ClientID: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
           model: 'clients', 
-          key: 'id'
+          key: 'ClientID'
         }
       },
-      consultant_id: {
+      ConsultantID: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
           model: 'consultants', 
-          key: 'id'
+          key: 'ConsultantID'
         }
       },
-      expected_work_hours: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      },
-      actual_utilization: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      createdAt: {
+      CreatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      UpdatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       }

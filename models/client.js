@@ -4,42 +4,68 @@ const {Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Client extends Model {
     static associate(models) {
-      Client.hasMany(models.TimeSubmission, {
-        foreignKey: 'client_id',
+      Client.hasMany(models.Timecard, {
+        foreignKey: 'ClientID',
       });
 
       Client.belongsToMany(models.Consultant,{
         through: models.ClientConsultant,
-        foreignKey: 'client_id',
+        foreignKey: 'ClientID',
       }); 
     }
   }
   
   Client.init({
-    name: {
+    ClientID: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    ClientName: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: false,
     },
-    client_code: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: true
+    ClientAddress: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    services: {
-        type: DataTypes.STRING,
-        allowNull: false,
+    BillingEmail: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    utilization_target: {
-        type: DataTypes.STRING,
-        allowNull: true,
+    PhoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    revenue: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-    }
+    InitialContractLength: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    MonthlyRevenue: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    OnboardingFee: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    AccountingSystem: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    RevenueRange: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    ActiveStatus: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+
   }, {
     timestamps:true,
+    createdAt: 'CreatedOn',
+    updatedAt: 'UpdatedOn',
     sequelize,
     modelName: 'Client',
     tableName: 'clients'

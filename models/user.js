@@ -9,15 +9,6 @@ module.exports = (sequelize, DataTypes) => {
         through: models.UserRole,
         foreignKey: 'user_id',
       });
-
-      User.belongsToMany(models.Branch,{
-        through: models.UserBranch,
-        foreignKey: 'user_id',
-      });
-      
-       User.hasMany(models.Resource, {
-        foreignKey: 'author'
-      });
       
       User.hasOne(models.ResetPassword, {
         foreignKey: "user_id"
@@ -35,14 +26,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   
   User.init({
-    first_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    last_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     sex: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -62,6 +45,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     timestamps:true,
+    createdAt: 'CreatedOn',
+    updatedAt: 'UpdatedOn',
     sequelize,
     modelName: 'User',
     tableName: 'users'

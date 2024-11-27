@@ -3,39 +3,57 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('clients', {
-      id: {
+      ClientID: { 
         allowNull: false,
-        autoIncrement: true,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4, 
         primaryKey: true,
-        type: Sequelize.INTEGER
       },
-      name: {
+      ClientName: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: false,
       },
-      client_code: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          unique: true
+      ClientAddress: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      services: {
-          type: Sequelize.STRING,
-          allowNull: false,
+      BillingEmail: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      utilization_target: {
-          type: Sequelize.STRING,
-          allowNull: true,
+      PhoneNumber: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      revenue: {
-          type: Sequelize.FLOAT(0.0),
-          allowNull: true,
+      InitialContractLength: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
-      createdAt: {
+      MonthlyRevenue: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      OnboardingFee: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      AccountingSystem: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      RevenueRange: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      ActiveStatus: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      CreatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      UpdatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       }

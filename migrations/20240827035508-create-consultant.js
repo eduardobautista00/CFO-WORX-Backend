@@ -3,11 +3,11 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('consultants', {
-      id: {
+      ConsultantID: { 
         allowNull: false,
-        autoIncrement: true,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4, 
         primaryKey: true,
-        type: Sequelize.INTEGER
       },
       user_id: {
         type: Sequelize.INTEGER,
@@ -17,23 +17,77 @@ module.exports = {
           key:'id'
         }
       },
-      title: {
-          type: Sequelize.STRING,
-          allowNull: false,
+      FirstName: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      salary_per_hour: {
-          type: Sequelize.FLOAT,
-          allowNull: true,
+      LastName: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      bill_rate: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
+      CompanyEmail: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      createdAt: {
+      PersonalEmail: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      EmergencyContactName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      EmergencyContactPhone: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      JobTitle: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      HireDate: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      PayType: {
+        type: Sequelize.ENUM('Hourly', 'Flat Rate'),
+        allowNull: false,
+      },
+      PayRate: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      TimecardCycle: {
+        type: Sequelize.ENUM('Weekly', 'Bi-Weekly', 'Monthly'),
+        allowNull: false,
+      },
+      DomesticInternational: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+      Status: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+      Address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      CreatedBy: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      UpdatedBy: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      CreatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      UpdatedOn: {
         allowNull: false,
         type: Sequelize.DATE
       }

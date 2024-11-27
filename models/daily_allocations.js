@@ -4,19 +4,19 @@ const {Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class DailyAllocation extends Model {
     static associate(models) {
-       DailyAllocation.belongsTo(models.TimeSubmission,{
-        foreignKey: 'time_submission_id'
+       DailyAllocation.belongsTo(models.Timecard,{
+        foreignKey: 'TimecardID'
        });
 
     }
   }
   DailyAllocation.init({
-    time_submission_id:{
+    TimecardID:{
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'time_submissions',
-        key: 'id'
+        model: 'timecards',
+        key: 'TimecardID'
       }
     },
     day_of_week: {
@@ -62,7 +62,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'DailyAllocation',
     tableName: 'daily_allocations',
     indexes : [
-        {fields: ['time_submission_id']}
+        {fields: ['TimecardID']}
     ]
   });
   return DailyAllocation;
